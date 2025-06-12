@@ -1,0 +1,64 @@
+{
+  "name": "electron-vue3-starter",
+  "version": "1.0.0",
+  "description": "A modern Electron application template with Vue 3, Vite, TypeScript, and Tailwind CSS",
+  "main": "dist/main/main.cjs",
+  "author": "Your Name",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "electron",
+    "vue3",
+    "vite",
+    "typescript",
+    "tailwindcss"
+  ],
+  "scripts": {
+    "dev": "npm run build:main && npm run build:preload && concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
+    "dev:vite": "vite",
+    "dev:electron": "wait-on tcp:5173 && electron .",
+    "build": "npm run build:renderer && npm run build:main && npm run build:preload",
+    "build:renderer": "vite build",
+    "build:main": "vite build --config build/vite.config.main.ts",
+    "build:preload": "vite build --config build/vite.config.preload.ts",
+    "build:all": "npm run build && electron-builder",
+    "build:win": "npm run build && electron-builder --win",
+    "build:mac": "npm run build && electron-builder --mac",
+    "build:linux": "npm run build && electron-builder --linux",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
+    "format": "prettier --write .",
+    "type-check": "vue-tsc --noEmit",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "@vitejs/plugin-vue": "^4.5.0",
+    "@vue/eslint-config-prettier": "^8.0.0",
+    "@vue/eslint-config-typescript": "^12.0.0",
+    "@vue/tsconfig": "^0.4.0",
+    "autoprefixer": "^10.4.16",
+    "concurrently": "^8.2.2",
+    "electron": "^27.1.0",
+    "electron-builder": "^24.6.4",
+    "eslint": "^8.54.0",
+    "eslint-plugin-vue": "^9.18.1",
+    "postcss": "^8.4.32",
+    "prettier": "^3.1.0",
+    "tailwindcss": "^3.3.6",
+    "typescript": "^5.3.2",
+    "vite": "^5.0.0",
+    "vue-tsc": "^1.8.22",
+    "wait-on": "^7.2.0"
+  },
+  "dependencies": {
+    "vue": "^3.3.8",
+    "vue-router": "^4.2.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
