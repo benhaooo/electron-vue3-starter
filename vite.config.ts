@@ -11,8 +11,8 @@ export default defineConfig({
     outDir: resolve(__dirname, 'dist/renderer'),
     emptyOutDir: true,
     rollupOptions: {
-      input: resolve(__dirname, 'src/renderer/index.html')
-    }
+      input: resolve(__dirname, 'src/renderer/index.html'),
+    },
   },
   resolve: {
     alias: {
@@ -20,15 +20,15 @@ export default defineConfig({
       '@/components': resolve(__dirname, 'src/renderer/components'),
       '@/views': resolve(__dirname, 'src/renderer/views'),
       '@/composables': resolve(__dirname, 'src/renderer/composables'),
-      '@/types': resolve(__dirname, 'src/renderer/types')
-    }
+      '@/types': resolve(__dirname, 'src/renderer/types'),
+    },
   },
   server: {
     port: 5173,
-    host: '0.0.0.0'
+    host: '0.0.0.0',
   },
   define: {
     __VUE_OPTIONS_API__: false,
-    __VUE_PROD_DEVTOOLS__: false
-  }
+    __VUE_PROD_DEVTOOLS__: false,
+  },
 })

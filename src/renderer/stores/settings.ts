@@ -1,24 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
-
-export interface AppSettings {
-  theme: 'light' | 'dark' | 'auto'
-  fontSize: number
-  notifications: {
-    desktop: boolean
-    sound: boolean
-    autoHide: boolean
-  }
-  performance: {
-    hardwareAcceleration: boolean
-    backgroundProcessing: boolean
-    memoryLimit: number
-  }
-  privacy: {
-    analytics: boolean
-    crashReports: boolean
-  }
-}
+import type { AppSettings, ValidationResult } from '@/types'
+import { handleSuccess, withErrorHandling } from '@/utils/errorHandler'
+import { deepClone } from '@/utils'
 
 const defaultSettings: AppSettings = {
   theme: 'light',
@@ -26,28 +10,94 @@ const defaultSettings: AppSettings = {
   notifications: {
     desktop: true,
     sound: false,
-    autoHide: true
+    autoHide: true,
   },
   performance: {
     hardwareAcceleration: true,
     backgroundProcessing: false,
-    memoryLimit: 1024
+    memoryLimit: 1024,
   },
   privacy: {
     analytics: false,
-    crashReports: true
-  }
+    crashReports: true,
+  },
 }
 
 const STORAGE_KEY = 'app-settings'
 
+// Settings validation function with detailed error reporting
+const validateSettings = (settings: any): ValidationResult => {
+  const errors: string[] = []
+
+  if (!settings || typeof settings !== 'object') {
+    return { isValid: false, errors: ['Settings must be an object'] }
+  }
+
+  // Validate theme
+  if (!['light', 'dark', 'auto'].includes(settings.theme)) {
+    errors.push('Theme must be "light", "dark", or "auto"')
+  }
+
+  // Validate fontSize
+  if (typeof settings.fontSize !== 'number' || settings.fontSize < 12 || settings.fontSize > 20) {
+    errors.push('Font size must be a number between 12 and 20')
+  }
+
+  // Validate notifications
+  if (!settings.notifications || typeof settings.notifications !== 'object') {
+    errors.push('Notifications settings must be an object')
+  } else {
+    if (typeof settings.notifications.desktop !== 'boolean') {
+      errors.push('Notifications.desktop must be a boolean')
+    }
+    if (typeof settings.notifications.sound !== 'boolean') {
+      errors.push('Notifications.sound must be a boolean')
+    }
+    if (typeof settings.notifications.autoHide !== 'boolean') {
+      errors.push('Notifications.autoHide must be a boolean')
+    }
+  }
+
+  // Validate performance
+  if (!settings.performance || typeof settings.performance !== 'object') {
+    errors.push('Performance settings must be an object')
+  } else {
+    if (typeof settings.performance.hardwareAcceleration !== 'boolean') {
+      errors.push('Performance.hardwareAcceleration must be a boolean')
+    }
+    if (typeof settings.performance.backgroundProcessing !== 'boolean') {
+      errors.push('Performance.backgroundProcessing must be a boolean')
+    }
+    if (
+      typeof settings.performance.memoryLimit !== 'number' ||
+      settings.performance.memoryLimit < 256
+    ) {
+      errors.push('Performance.memoryLimit must be a number >= 256')
+    }
+  }
+
+  // Validate privacy
+  if (!settings.privacy || typeof settings.privacy !== 'object') {
+    errors.push('Privacy settings must be an object')
+  } else {
+    if (typeof settings.privacy.analytics !== 'boolean') {
+      errors.push('Privacy.analytics must be a boolean')
+    }
+    if (typeof settings.privacy.crashReports !== 'boolean') {
+      errors.push('Privacy.crashReports must be a boolean')
+    }
+  }
+
+  return { isValid: errors.length === 0, errors }
+}
+
 export const useSettingsStore = defineStore('settings', () => {
-  // 状态
+  // State
   const settings = ref<AppSettings>({ ...defaultSettings })
   const isLoading = ref(false)
   const hasUnsavedChanges = ref(false)
 
-  // 应用主题设置
+  // Apply theme settings to DOM
   const applyTheme = (theme: string) => {
     const html = document.documentElement
     html.classList.remove('light', 'dark')
@@ -57,176 +107,221 @@ export const useSettingsStore = defineStore('settings', () => {
     } else if (theme === 'light') {
       html.classList.add('light')
     } else {
-      // auto theme - 检测系统偏好
+      // Auto theme - detect system preference
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
       const appliedTheme = prefersDark ? 'dark' : 'light'
       html.classList.add(appliedTheme)
     }
   }
 
-  // 应用字体大小设置
+  // Apply font size settings to DOM
   const applyFontSize = (fontSize: number) => {
     document.documentElement.style.fontSize = `${fontSize}px`
   }
 
-  // 自动保存设置到 localStorage
-  const autoSaveSettings = () => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings.value))
-      hasUnsavedChanges.value = false
-    } catch (error) {
-      console.error('Failed to auto-save settings:', error)
-    }
+  // Auto-save settings to localStorage
+  const autoSaveSettings = async () => {
+    await withErrorHandling(
+      async () => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(settings.value))
+        hasUnsavedChanges.value = false
+      },
+      'Failed to auto-save settings',
+      {
+        title: 'Settings Save Warning',
+        type: 'warning',
+      }
+    )
   }
 
-  // 加载设置
-  const loadSettings = () => {
+  // Load settings from localStorage
+  const loadSettings = async () => {
     isLoading.value = true
 
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY)
-      if (saved) {
-        const savedSettings = JSON.parse(saved)
-        settings.value = { ...defaultSettings, ...savedSettings }
-      } else {
-        settings.value = { ...defaultSettings }
+    await withErrorHandling(
+      async () => {
+        const saved = localStorage.getItem(STORAGE_KEY)
+        if (saved) {
+          const savedSettings = JSON.parse(saved)
+          // Validate loaded settings
+          const validation = validateSettings(savedSettings)
+          if (validation.isValid) {
+            settings.value = { ...defaultSettings, ...savedSettings }
+          } else {
+            console.warn('Invalid settings format:', validation.errors)
+            settings.value = deepClone(defaultSettings)
+          }
+        } else {
+          settings.value = deepClone(defaultSettings)
+        }
+      },
+      'Failed to load settings',
+      {
+        showUserNotification: false, // 不显示通知，静默失败
+        logToConsole: true,
       }
-    } catch (error) {
-      console.error('Failed to parse saved settings:', error)
-      settings.value = { ...defaultSettings }
-    } finally {
-      isLoading.value = false
-    }
+    )
+
+    isLoading.value = false
   }
 
-  // 手动保存设置
-  const saveSettings = async () => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings.value))
-      hasUnsavedChanges.value = false
+  // Manually save settings with user confirmation
+  const saveSettings = async (): Promise<boolean> => {
+    const result = await withErrorHandling(
+      async () => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(settings.value))
+        hasUnsavedChanges.value = false
+        await handleSuccess('Your settings have been saved successfully!', 'Settings Saved')
+        return true
+      },
+      'Failed to save settings',
+      {
+        title: 'Save Failed',
+      }
+    )
 
-      if (window.electronAPI) {
-        await window.electronAPI.showMessageBox({
-          type: 'info',
-          title: 'Settings Saved',
-          message: 'Your settings have been saved successfully!'
-        })
-      }
-      return true
-    } catch (error) {
-      console.error('Failed to save settings:', error)
-      if (window.electronAPI) {
-        await window.electronAPI.showMessageBox({
-          type: 'error',
-          title: 'Save Failed',
-          message: 'Failed to save settings. Please try again.'
-        })
-      }
-      return false
-    }
+    return result !== null
   }
 
-  // 重置设置
+  // Reset settings to defaults
   const resetSettings = () => {
-    settings.value = { ...defaultSettings }
+    settings.value = deepClone(defaultSettings)
     hasUnsavedChanges.value = true
   }
 
-  // 导出设置
-  const exportSettings = async () => {
-    if (window.electronAPI) {
-      try {
-        const result = await window.electronAPI.showSaveDialog({
+  // Export settings to JSON file
+  const exportSettings = async (): Promise<boolean> => {
+    if (!window.electronAPI) return false
+
+    const result = await withErrorHandling(
+      async () => {
+        const dialogResult = await window.electronAPI.showSaveDialog({
           defaultPath: 'app-settings.json',
-          filters: [
-            { name: 'JSON Files', extensions: ['json'] }
-          ]
+          filters: [{ name: 'JSON Files', extensions: ['json'] }],
         })
-        
-        if (!result.canceled && result.filePath) {
+
+        if (!dialogResult.canceled && dialogResult.filePath) {
           const settingsJson = JSON.stringify(settings.value, null, 2)
-          const writeResult = await window.electronAPI.writeFile(result.filePath, settingsJson)
-          
+          const writeResult = await window.electronAPI.writeFile(
+            dialogResult.filePath,
+            settingsJson
+          )
+
           if (writeResult.success) {
-            await window.electronAPI.showMessageBox({
-              type: 'info',
-              title: 'Export Complete',
-              message: `Settings successfully exported to: ${result.filePath}`
-            })
+            await handleSuccess(
+              `Settings successfully exported to: ${dialogResult.filePath}`,
+              'Export Complete'
+            )
             return true
           } else {
-            await window.electronAPI.showMessageBox({
-              type: 'error',
-              title: 'Export Failed',
-              message: `Failed to export settings: ${writeResult.error}`
-            })
-            return false
+            throw new Error(writeResult.error || 'Failed to write file')
           }
         }
-      } catch (error) {
-        console.error('Failed to export settings:', error)
-        if (window.electronAPI) {
-          await window.electronAPI.showMessageBox({
-            type: 'error',
-            title: 'Export Error',
-            message: `An error occurred: ${error instanceof Error ? error.message : 'Unknown error'}`
-          })
-        }
         return false
+      },
+      'Failed to export settings',
+      {
+        title: 'Export Error',
       }
-    }
-    return false
+    )
+
+    return result !== null && result !== false
   }
 
-  // 初始化设置（加载并应用）
-  const initializeSettings = () => {
-    loadSettings()
+  // Import settings from JSON file
+  const importSettings = async (): Promise<boolean> => {
+    if (!window.electronAPI) return false
+
+    const result = await withErrorHandling(
+      async () => {
+        const dialogResult = await window.electronAPI.showOpenDialog({
+          filters: [{ name: 'JSON Files', extensions: ['json'] }],
+          properties: ['openFile'],
+        })
+
+        if (!dialogResult.canceled && dialogResult.filePaths.length > 0) {
+          const filePath = dialogResult.filePaths[0]
+          // Note: In a real implementation, you'd need to add a file read IPC handler
+          // For now, we'll show a placeholder
+          await handleSuccess(
+            `Settings import from ${filePath} would be implemented here`,
+            'Import Placeholder'
+          )
+          return true
+        }
+        return false
+      },
+      'Failed to import settings',
+      {
+        title: 'Import Error',
+      }
+    )
+
+    return result !== null && result !== false
+  }
+
+  // Initialize settings (load and apply)
+  const initializeSettings = async () => {
+    await loadSettings()
     applyTheme(settings.value.theme)
     applyFontSize(settings.value.fontSize)
   }
 
-  // 监听设置变化并自动应用 + 保存
-  watch(() => settings.value.theme, (newTheme: string) => {
-    applyTheme(newTheme)
-    autoSaveSettings()
-    hasUnsavedChanges.value = false
-  }, { immediate: false })
+  // Debounced auto-save function
+  let saveTimeout: NodeJS.Timeout | null = null
+  const debouncedAutoSave = () => {
+    if (saveTimeout) {
+      clearTimeout(saveTimeout)
+    }
+    saveTimeout = setTimeout(async () => {
+      await autoSaveSettings()
+      hasUnsavedChanges.value = false
+    }, 500) // 500ms debounce delay
+  }
 
-  watch(() => settings.value.fontSize, (newSize: number) => {
-    applyFontSize(newSize)
-    autoSaveSettings()
-    hasUnsavedChanges.value = false
-  }, { immediate: false })
+  // Watch theme changes and apply immediately
+  watch(
+    () => settings.value.theme,
+    (newTheme: string) => {
+      applyTheme(newTheme)
+      debouncedAutoSave()
+    },
+    { immediate: false }
+  )
 
-  // 监听其他设置变化
-  watch(() => settings.value.notifications, () => {
-    autoSaveSettings()
-    hasUnsavedChanges.value = false
-  }, { deep: true, immediate: false })
+  // Watch font size changes and apply immediately
+  watch(
+    () => settings.value.fontSize,
+    (newSize: number) => {
+      applyFontSize(newSize)
+      debouncedAutoSave()
+    },
+    { immediate: false }
+  )
 
-  watch(() => settings.value.performance, () => {
-    autoSaveSettings()
-    hasUnsavedChanges.value = false
-  }, { deep: true, immediate: false })
-
-  watch(() => settings.value.privacy, () => {
-    autoSaveSettings()
-    hasUnsavedChanges.value = false
-  }, { deep: true, immediate: false })
+  // Watch all other settings changes
+  watch(
+    () => [settings.value.notifications, settings.value.performance, settings.value.privacy],
+    () => {
+      debouncedAutoSave()
+    },
+    { deep: true, immediate: false }
+  )
 
   return {
-    // 状态
+    // State
     settings,
     isLoading,
     hasUnsavedChanges,
-    
-    // 方法
+
+    // Methods
     loadSettings,
     saveSettings,
     resetSettings,
     exportSettings,
+    importSettings,
     initializeSettings,
     applyTheme,
-    applyFontSize
+    applyFontSize,
   }
 })

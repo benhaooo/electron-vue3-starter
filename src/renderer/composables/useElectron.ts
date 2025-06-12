@@ -20,18 +20,18 @@ export function useElectron() {
     try {
       const [platform, version] = await Promise.all([
         window.electronAPI.getPlatform(),
-        window.electronAPI.getVersion()
+        window.electronAPI.getVersion(),
       ])
 
       // 使用 window.electronAPI 获取版本信息，而不是直接访问 process
       const versions = await window.electronAPI.getVersions()
-      
+
       const info: SystemInfo = {
         platform,
         version,
         electronVersion: versions?.electron || 'N/A',
         nodeVersion: versions?.node || 'N/A',
-        chromeVersion: versions?.chrome || 'N/A'
+        chromeVersion: versions?.chrome || 'N/A',
       }
 
       systemInfo.value = info
@@ -94,6 +94,6 @@ export function useElectron() {
     minimizeWindow,
     maximizeWindow,
     closeWindow,
-    isWindowMaximized
+    isWindowMaximized,
   }
 }

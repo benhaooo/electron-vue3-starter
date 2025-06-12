@@ -38,9 +38,9 @@ const electronAPI: ElectronAPI = {
   getVersions: () => ipcRenderer.invoke('app:getVersions'),
 
   // Dialog methods
-  showMessageBox: (options) => ipcRenderer.invoke('dialog:showMessageBox', options),
-  showOpenDialog: (options) => ipcRenderer.invoke('dialog:showOpenDialog', options),
-  showSaveDialog: (options) => ipcRenderer.invoke('dialog:showSaveDialog', options),
+  showMessageBox: options => ipcRenderer.invoke('dialog:showMessageBox', options),
+  showOpenDialog: options => ipcRenderer.invoke('dialog:showOpenDialog', options),
+  showSaveDialog: options => ipcRenderer.invoke('dialog:showSaveDialog', options),
 
   // Window controls
   minimizeWindow: () => ipcRenderer.invoke('window:minimize'),
@@ -52,15 +52,15 @@ const electronAPI: ElectronAPI = {
   writeFile: (filePath, content) => ipcRenderer.invoke('fs:writeFile', filePath, content),
 
   // Shell operations
-  openExternal: (url) => ipcRenderer.invoke('shell:openExternal', url),
+  openExternal: url => ipcRenderer.invoke('shell:openExternal', url),
 
   // Event listeners
-  onShowAbout: (callback) => {
+  onShowAbout: callback => {
     ipcRenderer.on('show-about', callback)
   },
-  removeAllListeners: (channel) => {
+  removeAllListeners: channel => {
     ipcRenderer.removeAllListeners(channel)
-  }
+  },
 }
 
 // Expose the API to the renderer process

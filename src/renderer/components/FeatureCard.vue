@@ -2,8 +2,15 @@
   <div class="feature-card">
     <div class="flex items-start space-x-4">
       <div class="flex-shrink-0">
-        <div class="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center transition-colors duration-200">
-          <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div
+          class="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center transition-colors duration-200"
+        >
+          <svg
+            class="w-6 h-6 text-primary-600 dark:text-primary-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icon"></path>
           </svg>
         </div>

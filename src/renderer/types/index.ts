@@ -1,22 +1,30 @@
 // Common type definitions for the renderer process
 
+export type ThemeMode = 'light' | 'dark' | 'auto'
+
+export interface NotificationSettings {
+  desktop: boolean
+  sound: boolean
+  autoHide: boolean
+}
+
+export interface PerformanceSettings {
+  hardwareAcceleration: boolean
+  backgroundProcessing: boolean
+  memoryLimit: number
+}
+
+export interface PrivacySettings {
+  analytics: boolean
+  crashReports: boolean
+}
+
 export interface AppSettings {
-  theme: 'light' | 'dark' | 'auto'
+  theme: ThemeMode
   fontSize: number
-  notifications: {
-    desktop: boolean
-    sound: boolean
-    autoHide: boolean
-  }
-  performance: {
-    hardwareAcceleration: boolean
-    backgroundProcessing: boolean
-    memoryLimit: number
-  }
-  privacy: {
-    analytics: boolean
-    crashReports: boolean
-  }
+  notifications: NotificationSettings
+  performance: PerformanceSettings
+  privacy: PrivacySettings
 }
 
 export interface SystemInfo {
@@ -54,4 +62,29 @@ export interface Theme {
 export interface NavigationRoute {
   path: string
   name: string
+  meta?: {
+    title?: string
+    requiresAuth?: boolean
+    icon?: string
+  }
+}
+
+// API Response types
+export interface ApiResponse<T = any> {
+  success: boolean
+  data?: T
+  error?: string
+}
+
+// Settings validation result
+export interface ValidationResult {
+  isValid: boolean
+  errors: string[]
+}
+
+// File operation result
+export interface FileOperationResult {
+  success: boolean
+  error?: string
+  filePath?: string
 }

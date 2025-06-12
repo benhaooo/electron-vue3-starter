@@ -8,7 +8,7 @@ import './style.css'
 // Create router instance
 const router = createRouter({
   history: createWebHashHistory(),
-  routes
+  routes,
 })
 
 // Create Pinia instance

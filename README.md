@@ -1,4 +1,3 @@
-
 # Electron Vue3 Starter
 
 一个现代化、全面的 Electron 应用模板，使用最新的 Web 技术构建跨平台桌面应用。
@@ -6,6 +5,7 @@
 ## 🚀 功能特性
 
 ### 核心技术
+
 - **Electron** - 跨平台桌面应用框架
 - **Vue 3** - 渐进式 JavaScript 框架，支持组合式 API
 - **Vite** - 快速的构建工具和开发服务器
@@ -13,6 +13,7 @@
 - **Tailwind CSS** - 实用优先的 CSS 框架
 
 ### 开发体验
+
 - ⚡ **热模块替换 (HMR)** - 开发过程中即时反馈
 - 🔧 **TypeScript 支持** - 主进程和渲染进程的完整类型安全
 - 🎨 **现代 UI 组件** - 使用 Tailwind CSS 的预构建组件
@@ -21,6 +22,7 @@
 - 🧪 **示例组件** - 全面的示例和模式
 
 ### Electron 特性
+
 - 🔒 **安全优先** - 上下文隔离和安全的 IPC 通信
 - 🖥️ **原生集成** - 系统对话框、菜单和窗口控制
 - 📦 **多平台构建** - 为 Windows、macOS 和 Linux 构建
@@ -56,12 +58,14 @@ electron-vue3-starter/
 ## 🛠️ 安装与设置
 
 ### 前提条件
+
 - Node.js 18.0.0 或更高版本
 - npm、yarn 或 pnpm
 
 ### 安装
 
 1. **克隆或下载此模板**
+
    ```bash
    git clone <仓库-URL>
    cd electron-vue3-starter
@@ -79,10 +83,13 @@ electron-vue3-starter/
 ## 🚀 开发
 
 ### 启动开发服务器
+
 ```bash
 npm run dev
 ```
+
 此命令将：
+
 - 启动渲染进程的 Vite 开发服务器
 - 启动支持热重载的 Electron
 - 在开发模式下自动打开 DevTools
@@ -90,23 +97,27 @@ npm run dev
 ### 可用脚本
 
 #### 开发
+
 - `npm run dev` - 启动带热重载的开发服务器
 - `npm run dev:vite` - 仅启动 Vite 开发服务器
 - `npm run dev:electron` - 仅启动 Electron（需要 Vite 服务器运行）
 
 #### 构建
+
 - `npm run build` - 构建所有进程（渲染器、主进程、预加载）
 - `npm run build:renderer` - 仅构建渲染进程
 - `npm run build:main` - 仅构建主进程
 - `npm run build:preload` - 仅构建预加载脚本
 
 #### 打包
+
 - `npm run build:all` - 为当前平台构建和打包
 - `npm run build:win` - 为 Windows 构建和打包
 - `npm run build:mac` - 为 macOS 构建和打包
 - `npm run build:linux` - 为 Linux 构建和打包
 
 #### 代码质量
+
 - `npm run lint` - 运行带自动修复的 ESLint
 - `npm run format` - 使用 Prettier 格式化代码
 - `npm run type-check` - 运行 TypeScript 类型检查
@@ -114,11 +125,13 @@ npm run dev
 ## 🏗️ 生产构建
 
 ### 构建应用
+
 ```bash
 npm run build
 ```
 
 ### 打包分发
+
 ```bash
 # 为当前平台
 npm run build:all
@@ -134,34 +147,41 @@ npm run build:linux  # Linux
 ## 🔧 配置
 
 ### Electron Builder
+
 在 `electron-builder.json` 中配置打包选项：
+
 - 应用元数据
 - 平台特定设置
 - 文件关联
 - 自动更新配置
 
 ### Vite 配置
+
 - `vite.config.ts` - 渲染进程配置
 - `build/vite.config.main.ts` - 主进程配置
 - `build/vite.config.preload.ts` - 预加载脚本配置
 
 ### TypeScript 配置
+
 - `tsconfig.json` - 渲染进程 TypeScript 配置
 - `tsconfig.node.json` - 主进程 TypeScript 配置
 
 ## 🎨 自定义
 
 ### 样式
+
 - 修改 `tailwind.config.js` 以自定义设计令牌
 - 更新 `src/renderer/style.css` 以设置全局样式
 - 在 Vue SFC 文件中创建组件特定样式
 
 ### 添加新页面
+
 1. 在 `src/renderer/views/` 中创建新的 Vue 组件
 2. 在 `src/renderer/router/index.ts` 中添加路由
 3. 在 `src/renderer/App.vue` 中更新导航
 
 ### IPC 通信
+
 1. 在 `src/main/main.ts` 中添加新的 IPC 处理程序
 2. 在 `src/preload/preload.ts` 中暴露方法
 3. 在 `src/renderer/types/electron.d.ts` 中更新 TypeScript 定义
@@ -169,12 +189,14 @@ npm run build:linux  # Linux
 ## 📚 包含的示例
 
 ### Vue 3 组合式 API
+
 - 响应式状态管理
 - 计算属性
 - 生命周期钩子
 - 自定义组合式函数
 
 ### Electron 集成
+
 - 系统信息检索
 - 文件对话框（打开/保存）
 - 窗口控制
@@ -182,6 +204,7 @@ npm run build:linux  # Linux
 - IPC 通信
 
 ### UI 组件
+
 - 功能卡片
 - 切换开关
 - 模态对话框
@@ -191,6 +214,7 @@ npm run build:linux  # Linux
 ## 🔒 安全
 
 此模板实现了 Electron 安全最佳实践：
+
 - **上下文隔离** - 渲染进程与 Node.js 隔离
 - **预加载脚本** - 安全的 IPC 通信桥接
 - **CSP 头** - Web 安全的内容安全策略
@@ -219,6 +243,7 @@ npm run build:linux  # Linux
 ## 📞 支持
 
 如果您遇到任何问题或有疑问：
+
 1. 查阅文档
 2. 搜索现有问题
 3. 创建一个详细的新问题
@@ -226,19 +251,24 @@ npm run build:linux  # Linux
 ## 🔧 常见问题解决
 
 ### 类型错误
+
 如果遇到 TypeScript 类型错误，请确保：
+
 1. 已安装 `@types/node` 和 `@types/electron`
 2. `tsconfig.json` 中包含正确的类型定义
 3. 在渲染进程中通过 `window.electronAPI` 访问 Electron 功能，而不是直接使用 `process` 对象
 
 ### 构建问题
+
 如果构建过程中遇到问题：
+
 1. 确保 Node.js 版本 >= 18.0.0
 2. 清除缓存：`npm run clean`
 3. 重新安装依赖：`npm ci`
 4. 逐步构建：先 `npm run build:renderer`，然后 `npm run build:main` 等
 
 ### 平台特定问题
+
 - **Windows**：确保安装了 Visual Studio 构建工具
 - **macOS**：确保安装了 Xcode 命令行工具
 - **Linux**：确保安装了必要的构建依赖

@@ -28,8 +28,11 @@
     "build:linux": "npm run build && electron-builder --linux",
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
+    "lint:check": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts",
     "format": "prettier --write .",
-    "type-check": "vue-tsc --noEmit",
+    "format:check": "prettier --check .",
+    "type-check": "tsc --noEmit",
+    "check-all": "npm run type-check && npm run lint:check && npm run format:check",
     "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {

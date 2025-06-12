@@ -10,9 +10,7 @@
     "nightwatch.conf.*",
     "playwright.config.*"
   ],
-  "exclude": [
-    "src/renderer/**/*"
-  ],
+  "exclude": ["src/renderer/**/*"],
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ES2022"],

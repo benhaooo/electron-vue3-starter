@@ -6,10 +6,7 @@
     role="switch"
     :aria-checked="modelValue"
   >
-    <span
-      class="toggle-switch-thumb"
-      :class="modelValue ? 'translate-x-6' : 'translate-x-1'"
-    />
+    <span class="toggle-switch-thumb" :class="modelValue ? 'translate-x-6' : 'translate-x-1'" />
   </button>
 </template>
 

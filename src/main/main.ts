@@ -1,7 +1,7 @@
-import { app, BrowserWindow, ipcMain, shell, dialog, Menu } from 'electron'
+import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'path'
-import { writeFile } from 'fs/promises'
 import { createMenu } from './menu'
+import { setupIpcHandlers, removeIpcHandlers } from './ipcHandlers'
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 // This is only needed for production builds with Squirrel installer
@@ -36,6 +36,7 @@ class ElectronApp {
     // Quit when all windows are closed, except on macOS
     app.on('window-all-closed', () => {
       if (process.platform !== 'darwin') {
+        removeIpcHandlers()
         app.quit()
       }
     })
@@ -64,8 +65,8 @@ class ElectronApp {
         contextIsolation: true,
         preload: join(__dirname, '../preload/preload.cjs'),
         webSecurity: true,
-        allowRunningInsecureContent: false
-      }
+        allowRunningInsecureContent: false,
+      },
     })
 
     // Load the app
@@ -93,83 +94,7 @@ class ElectronApp {
   }
 
   private setupIPC(): void {
-    // Example IPC handlers
-    ipcMain.handle('app:getVersion', () => {
-      return app.getVersion()
-    })
-
-    ipcMain.handle('app:getPlatform', () => {
-      return process.platform
-    })
-
-    ipcMain.handle('app:getVersions', () => {
-      return {
-        node: process.versions.node,
-        electron: process.versions.electron,
-        chrome: process.versions.chrome
-      }
-    })
-
-    ipcMain.handle('dialog:showMessageBox', async (_, options) => {
-      if (!this.mainWindow) return
-      const result = await dialog.showMessageBox(this.mainWindow, options)
-      return result
-    })
-
-    ipcMain.handle('dialog:showOpenDialog', async (_, options) => {
-      if (!this.mainWindow) return
-      const result = await dialog.showOpenDialog(this.mainWindow, options)
-      return result
-    })
-
-    ipcMain.handle('dialog:showSaveDialog', async (_, options) => {
-      if (!this.mainWindow) return
-      const result = await dialog.showSaveDialog(this.mainWindow, options)
-      return result
-    })
-
-    // Window controls
-    ipcMain.handle('window:minimize', () => {
-      this.mainWindow?.minimize()
-    })
-
-    ipcMain.handle('window:maximize', () => {
-      if (this.mainWindow?.isMaximized()) {
-        this.mainWindow.unmaximize()
-      } else {
-        this.mainWindow?.maximize()
-      }
-    })
-
-    ipcMain.handle('window:close', () => {
-      this.mainWindow?.close()
-    })
-
-    ipcMain.handle('window:isMaximized', () => {
-      return this.mainWindow?.isMaximized() ?? false
-    })
-
-    // 文件操作
-    ipcMain.handle('fs:writeFile', async (_, filePath: string, content: string) => {
-      try {
-        await writeFile(filePath, content, 'utf8')
-        return { success: true }
-      } catch (error) {
-        console.error('Failed to write file:', error)
-        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
-      }
-    })
-
-    // 打开外部链接
-    ipcMain.handle('shell:openExternal', async (_, url: string) => {
-      try {
-        await shell.openExternal(url)
-        return { success: true }
-      } catch (error) {
-        console.error('Failed to open external URL:', error)
-        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
-      }
-    })
+    setupIpcHandlers(this.mainWindow)
   }
 }
 

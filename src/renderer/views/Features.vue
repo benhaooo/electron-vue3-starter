@@ -13,7 +13,7 @@
       <p class="text-gray-600 mb-6">
         Demonstrate secure communication between the main and renderer processes
       </p>
-      
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <h3 class="font-medium text-gray-900 mb-3">Window Controls</h3>
@@ -26,13 +26,11 @@
             </button>
           </div>
         </div>
-        
+
         <div>
           <h3 class="font-medium text-gray-900 mb-3">System Dialogs</h3>
           <div class="space-y-2">
-            <button @click="showInfoDialog" class="btn btn-primary w-full">
-              Show Info Dialog
-            </button>
+            <button @click="showInfoDialog" class="btn btn-primary w-full">Show Info Dialog</button>
             <button @click="showWarningDialog" class="btn btn-secondary w-full">
               Show Warning Dialog
             </button>
@@ -47,7 +45,7 @@
       <p class="text-gray-600 mb-6">
         Interactive examples showcasing Vue 3's Composition API features
       </p>
-      
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <h3 class="font-medium text-gray-900 mb-3">Reactive Counter</h3>
@@ -58,7 +56,7 @@
           </div>
           <button @click="resetCounter" class="btn btn-secondary mt-2 w-full">Reset</button>
         </div>
-        
+
         <div>
           <h3 class="font-medium text-gray-900 mb-3">Computed Properties</h3>
           <div class="space-y-2">
@@ -73,10 +71,8 @@
     <!-- Reactive Form Demo -->
     <div class="card mb-8">
       <h2 class="text-xl font-semibold text-gray-900 mb-4">Reactive Forms</h2>
-      <p class="text-gray-600 mb-6">
-        Demonstrate reactive form handling with validation
-      </p>
-      
+      <p class="text-gray-600 mb-6">Demonstrate reactive form handling with validation</p>
+
       <form @submit.prevent="handleSubmit" class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
@@ -89,7 +85,7 @@
           />
           <p v-if="errors.name" class="text-red-500 text-sm mt-1">{{ errors.name }}</p>
         </div>
-        
+
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
           <input
@@ -101,7 +97,7 @@
           />
           <p v-if="errors.email" class="text-red-500 text-sm mt-1">{{ errors.email }}</p>
         </div>
-        
+
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Message</label>
           <textarea
@@ -113,12 +109,10 @@
           ></textarea>
           <p v-if="errors.message" class="text-red-500 text-sm mt-1">{{ errors.message }}</p>
         </div>
-        
-        <button type="submit" class="btn btn-primary w-full">
-          Submit Form
-        </button>
+
+        <button type="submit" class="btn btn-primary w-full">Submit Form</button>
       </form>
-      
+
       <div v-if="formSubmitted" class="mt-4 p-4 bg-green-100 border border-green-400 rounded-lg">
         <h4 class="font-medium text-green-800">Form Submitted Successfully!</h4>
         <pre class="text-sm text-green-700 mt-2">{{ JSON.stringify(form, null, 2) }}</pre>
@@ -131,7 +125,7 @@
       <p class="text-gray-600 mb-6">
         Real-time performance metrics and component lifecycle tracking
       </p>
-      
+
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="text-center">
           <div class="text-2xl font-bold text-primary-600">{{ renderCount }}</div>
@@ -165,19 +159,19 @@ const counterStatus = computed(() => {
 
 const incrementCounter = () => counter.value++
 const decrementCounter = () => counter.value--
-const resetCounter = () => counter.value = 0
+const resetCounter = () => (counter.value = 0)
 
 // Form demo
 const form = reactive({
   name: '',
   email: '',
-  message: ''
+  message: '',
 })
 
 const errors = reactive({
   name: '',
   email: '',
-  message: ''
+  message: '',
 })
 
 const formSubmitted = ref(false)
@@ -186,11 +180,11 @@ const validateForm = () => {
   errors.name = form.name.trim() ? '' : 'Name is required'
   errors.email = form.email.trim() ? '' : 'Email is required'
   errors.message = form.message.trim() ? '' : 'Message is required'
-  
+
   if (form.email && !/\S+@\S+\.\S+/.test(form.email)) {
     errors.email = 'Please enter a valid email'
   }
-  
+
   return !errors.name && !errors.email && !errors.message
 }
 
@@ -238,7 +232,7 @@ const showInfoDialog = async () => {
       type: 'info',
       title: 'Information',
       message: 'This is an information dialog from the main process!',
-      detail: 'IPC communication is working correctly.'
+      detail: 'IPC communication is working correctly.',
     })
   }
 }
@@ -249,7 +243,7 @@ const showWarningDialog = async () => {
       type: 'warning',
       title: 'Warning',
       message: 'This is a warning dialog.',
-      detail: 'This demonstrates different dialog types.'
+      detail: 'This demonstrates different dialog types.',
     })
   }
 }

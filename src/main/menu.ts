@@ -11,7 +11,7 @@ export function createMenu(): void {
           click: () => {
             // Handle new file
             console.log('New file')
-          }
+          },
         },
         {
           label: 'Open',
@@ -19,7 +19,7 @@ export function createMenu(): void {
           click: () => {
             // Handle open file
             console.log('Open file')
-          }
+          },
         },
         { type: 'separator' },
         {
@@ -27,9 +27,9 @@ export function createMenu(): void {
           accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q',
           click: () => {
             app.quit()
-          }
-        }
-      ]
+          },
+        },
+      ],
     },
     {
       label: 'Edit',
@@ -40,8 +40,8 @@ export function createMenu(): void {
         { role: 'cut' },
         { role: 'copy' },
         { role: 'paste' },
-        { role: 'selectAll' }
-      ]
+        { role: 'selectAll' },
+      ],
     },
     {
       label: 'View',
@@ -54,15 +54,12 @@ export function createMenu(): void {
         { role: 'zoomIn' },
         { role: 'zoomOut' },
         { type: 'separator' },
-        { role: 'togglefullscreen' }
-      ]
+        { role: 'togglefullscreen' },
+      ],
     },
     {
       label: 'Window',
-      submenu: [
-        { role: 'minimize' },
-        { role: 'close' }
-      ]
+      submenu: [{ role: 'minimize' }, { role: 'close' }],
     },
     {
       label: 'Help',
@@ -74,16 +71,16 @@ export function createMenu(): void {
             if (focusedWindow) {
               focusedWindow.webContents.send('show-about')
             }
-          }
+          },
         },
         {
           label: 'Learn More',
           click: () => {
             shell.openExternal('https://electronjs.org')
-          }
-        }
-      ]
-    }
+          },
+        },
+      ],
+    },
   ]
 
   // macOS specific menu adjustments
@@ -99,8 +96,8 @@ export function createMenu(): void {
         { role: 'hideOthers' },
         { role: 'unhide' },
         { type: 'separator' },
-        { role: 'quit' }
-      ]
+        { role: 'quit' },
+      ],
     })
 
     // Window menu
@@ -111,7 +108,7 @@ export function createMenu(): void {
         { role: 'minimize' },
         { role: 'zoom' },
         { type: 'separator' },
-        { role: 'front' }
+        { role: 'front' },
       ]
     }
   }

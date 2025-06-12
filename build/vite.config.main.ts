@@ -7,18 +7,31 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, '../src/main/main.ts'),
       formats: ['cjs'],
-      fileName: () => 'main.cjs'
+      fileName: () => 'main.cjs',
     },
     outDir: resolve(__dirname, '../dist/main'),
     emptyOutDir: true,
     rollupOptions: {
-      external: ['electron', 'path', 'fs', 'fs/promises', 'os', 'crypto', 'buffer', 'stream', 'util', 'url', 'string_decoder', 'events']
+      external: [
+        'electron',
+        'path',
+        'fs',
+        'fs/promises',
+        'os',
+        'crypto',
+        'buffer',
+        'stream',
+        'util',
+        'url',
+        'string_decoder',
+        'events',
+      ],
     },
-    minify: false
+    minify: false,
   },
   resolve: {
     alias: {
-      '@main': resolve(__dirname, '../src/main')
-    }
-  }
+      '@main': resolve(__dirname, '../src/main'),
+    },
+  },
 })
