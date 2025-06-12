@@ -4,6 +4,7 @@ export default {
     './src/renderer/index.html',
     './src/renderer/**/*.{vue,js,ts,jsx,tsx}'
   ],
+  darkMode: 'class', // 启用基于类的暗色模式
   theme: {
     extend: {
       colors: {

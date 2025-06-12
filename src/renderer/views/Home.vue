@@ -67,11 +67,15 @@
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">Node.js:</span>
-          <span class="font-medium">{{ process.versions?.node || 'N/A' }}</span>
+          <span class="font-medium">{{ systemInfo.nodeVersion || 'N/A' }}</span>
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">Electron:</span>
-          <span class="font-medium">{{ process.versions?.electron || 'N/A' }}</span>
+          <span class="font-medium">{{ systemInfo.electronVersion || 'N/A' }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-600">Chrome:</span>
+          <span class="font-medium">{{ systemInfo.chromeVersion || 'N/A' }}</span>
         </div>
       </div>
     </div>
@@ -85,6 +89,9 @@ import FeatureCard from '@/components/FeatureCard.vue'
 interface SystemInfo {
   platform: string
   version: string
+  nodeVersion: string
+  electronVersion: string
+  chromeVersion: string
 }
 
 const systemInfo = ref<SystemInfo | null>(null)
@@ -125,12 +132,19 @@ const features = [
 const showSystemInfo = async () => {
   if (window.electronAPI) {
     try {
-      const [platform, version] = await Promise.all([
+      const [platform, version, versions] = await Promise.all([
         window.electronAPI.getPlatform(),
-        window.electronAPI.getVersion()
+        window.electronAPI.getVersion(),
+        window.electronAPI.getVersions()
       ])
-      
-      systemInfo.value = { platform, version }
+
+      systemInfo.value = {
+        platform,
+        version,
+        nodeVersion: versions.node,
+        electronVersion: versions.electron,
+        chromeVersion: versions.chrome
+      }
     } catch (error) {
       console.error('Failed to get system info:', error)
     }

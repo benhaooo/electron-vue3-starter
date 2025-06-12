@@ -40,7 +40,7 @@ export function createMenu(): void {
         { role: 'cut' },
         { role: 'copy' },
         { role: 'paste' },
-        { role: 'selectall' }
+        { role: 'selectAll' }
       ]
     },
     {

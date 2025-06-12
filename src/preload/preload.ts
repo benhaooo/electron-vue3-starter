@@ -5,6 +5,7 @@ export interface ElectronAPI {
   // App methods
   getVersion: () => Promise<string>
   getPlatform: () => Promise<string>
+  getVersions: () => Promise<{ node: string; electron: string; chrome: string }>
 
   // Dialog methods
   showMessageBox: (options: Electron.MessageBoxOptions) => Promise<Electron.MessageBoxReturnValue>
@@ -20,6 +21,9 @@ export interface ElectronAPI {
   // File operations
   writeFile: (filePath: string, content: string) => Promise<{ success: boolean; error?: string }>
 
+  // Shell operations
+  openExternal: (url: string) => Promise<{ success: boolean; error?: string }>
+
   // Event listeners
   onShowAbout: (callback: () => void) => void
   removeAllListeners: (channel: string) => void
@@ -31,6 +35,7 @@ const electronAPI: ElectronAPI = {
   // App methods
   getVersion: () => ipcRenderer.invoke('app:getVersion'),
   getPlatform: () => ipcRenderer.invoke('app:getPlatform'),
+  getVersions: () => ipcRenderer.invoke('app:getVersions'),
 
   // Dialog methods
   showMessageBox: (options) => ipcRenderer.invoke('dialog:showMessageBox', options),
@@ -45,6 +50,9 @@ const electronAPI: ElectronAPI = {
 
   // File operations
   writeFile: (filePath, content) => ipcRenderer.invoke('fs:writeFile', filePath, content),
+
+  // Shell operations
+  openExternal: (url) => ipcRenderer.invoke('shell:openExternal', url),
 
   // Event listeners
   onShowAbout: (callback) => {

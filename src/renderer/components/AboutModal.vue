@@ -2,55 +2,57 @@
   <div class="fixed inset-0 z-50 overflow-y-auto">
     <div class="flex min-h-screen items-center justify-center p-4">
       <!-- Backdrop -->
-      <div 
-        class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+      <div
+        class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-60 transition-opacity"
         @click="$emit('close')"
       ></div>
-      
+
       <!-- Modal -->
-      <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6 animate-slide-up">
+      <div class="modal-content relative bg-white dark:bg-gray-800 rounded-xl shadow-xl dark:shadow-2xl max-w-md w-full p-6 animate-slide-up border border-gray-200 dark:border-gray-700 transition-colors duration-200">
         <!-- Close button -->
         <button
           @click="$emit('close')"
-          class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+          class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
         </button>
-        
+
         <!-- Content -->
         <div class="text-center">
-          <div class="w-16 h-16 mx-auto bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl flex items-center justify-center mb-4">
+          <div class="w-16 h-16 mx-auto bg-gradient-to-br from-primary-500 to-primary-700 dark:from-primary-400 dark:to-primary-600 rounded-2xl flex items-center justify-center mb-4">
             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
             </svg>
           </div>
-          
-          <h2 class="text-2xl font-bold text-gray-900 mb-2">Electron Vue3 Starter</h2>
-          <p class="text-gray-600 mb-4">Version {{ appVersion }}</p>
+
+          <h2 class="modal-title text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Electron Vue3 Starter</h2>
+          <p class="modal-text text-gray-600 dark:text-gray-400 mb-4">Version {{ appVersion }}</p>
           
           <div class="text-left space-y-3 mb-6">
             <div class="flex justify-between">
-              <span class="text-gray-600">Platform:</span>
-              <span class="font-medium">{{ platform }}</span>
+              <span class="modal-text text-gray-600 dark:text-gray-400">Platform:</span>
+              <span class="font-medium text-gray-900 dark:text-gray-100">{{ platform }}</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-gray-600">Electron:</span>
-              <span class="font-medium">{{ electronVersion }}</span>
+              <span class="modal-text text-gray-600 dark:text-gray-400">Electron:</span>
+              <span class="font-medium text-gray-900 dark:text-gray-100">{{ electronVersion }}</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-gray-600">Node.js:</span>
-              <span class="font-medium">{{ nodeVersion }}</span>
+              <span class="modal-text text-gray-600 dark:text-gray-400">Node.js:</span>
+              <span class="font-medium text-gray-900 dark:text-gray-100">{{ nodeVersion }}</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-gray-600">Chrome:</span>
-              <span class="font-medium">{{ chromeVersion }}</span>
+              <span class="modal-text text-gray-600 dark:text-gray-400">Chrome:</span>
+              <span class="font-medium text-gray-900 dark:text-gray-100">{{ chromeVersion }}</span>
             </div>
           </div>
-          
-          <p class="text-sm text-gray-600 mb-6">
+
+          <p class="modal-text text-sm text-gray-600 dark:text-gray-400 mb-6">
             A modern desktop application template built with Electron, Vue 3, Vite, TypeScript, and Tailwind CSS.
+            <br>
+            Created by <a href="https://github.com/benhaooo" class="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors">@benhaooo</a>
           </p>
           
           <div class="flex space-x-3">
@@ -91,23 +93,43 @@ const chromeVersion = ref('N/A')
 onMounted(async () => {
   if (window.electronAPI) {
     try {
-      appVersion.value = await window.electronAPI.getVersion()
-      platform.value = await window.electronAPI.getPlatform()
+      // 获取应用信息
+      const [version, platformInfo, versions] = await Promise.all([
+        window.electronAPI.getVersion(),
+        window.electronAPI.getPlatform(),
+        window.electronAPI.getVersions()
+      ])
+
+      appVersion.value = version
+      platform.value = platformInfo
+      electronVersion.value = versions.electron
+      nodeVersion.value = versions.node
+      chromeVersion.value = versions.chrome
     } catch (error) {
       console.error('Failed to get app info:', error)
+      // 设置默认值
+      electronVersion.value = 'N/A'
+      nodeVersion.value = 'N/A'
+      chromeVersion.value = 'N/A'
     }
-  }
-  
-  // Get version info from process.versions if available
-  if (process.versions) {
-    electronVersion.value = process.versions.electron || 'N/A'
-    nodeVersion.value = process.versions.node || 'N/A'
-    chromeVersion.value = process.versions.chrome || 'N/A'
   }
 })
 
-const openGitHub = () => {
-  // In a real app, you would use shell.openExternal through IPC
-  console.log('Opening GitHub repository...')
+const openGitHub = async () => {
+  const githubUrl = 'https://github.com/benhaooo'
+
+  if (window.electronAPI) {
+    try {
+      // 通过 Electron 打开外部链接
+      await window.electronAPI.openExternal(githubUrl)
+    } catch (error) {
+      console.error('Failed to open GitHub link:', error)
+      // 降级方案：在浏览器中打开
+      window.open(githubUrl, '_blank')
+    }
+  } else {
+    // 如果不在 Electron 环境中，直接在浏览器中打开
+    window.open(githubUrl, '_blank')
+  }
 }
 </script>

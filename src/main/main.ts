@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, shell, dialog } from 'electron'
+import { app, BrowserWindow, ipcMain, shell, dialog, Menu } from 'electron'
 import { join } from 'path'
 import { writeFile } from 'fs/promises'
 import { createMenu } from './menu'
@@ -57,7 +57,7 @@ class ElectronApp {
       minWidth: 800,
       minHeight: 600,
       show: false,
-      autoHideMenuBar: false,
+      autoHideMenuBar: true, // 隐藏菜单栏，按 Alt 键显示
       titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
       webPreferences: {
         nodeIntegration: false,
@@ -69,16 +69,11 @@ class ElectronApp {
     })
 
     // Load the app
-    console.log('Development mode:', this.isDev)
-    console.log('App packaged:', app.isPackaged)
-
     if (this.isDev) {
-      console.log('Loading development URL: http://localhost:5173')
       this.mainWindow.loadURL('http://localhost:5173')
       // Open DevTools in development
       this.mainWindow.webContents.openDevTools()
     } else {
-      console.log('Loading production file:', join(__dirname, '../renderer/index.html'))
       this.mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
     }
 
@@ -105,6 +100,14 @@ class ElectronApp {
 
     ipcMain.handle('app:getPlatform', () => {
       return process.platform
+    })
+
+    ipcMain.handle('app:getVersions', () => {
+      return {
+        node: process.versions.node,
+        electron: process.versions.electron,
+        chrome: process.versions.chrome
+      }
     })
 
     ipcMain.handle('dialog:showMessageBox', async (_, options) => {
@@ -153,6 +156,17 @@ class ElectronApp {
         return { success: true }
       } catch (error) {
         console.error('Failed to write file:', error)
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+      }
+    })
+
+    // 打开外部链接
+    ipcMain.handle('shell:openExternal', async (_, url: string) => {
+      try {
+        await shell.openExternal(url)
+        return { success: true }
+      } catch (error) {
+        console.error('Failed to open external URL:', error)
         return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
       }
     })

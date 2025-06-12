@@ -1,5 +1,7 @@
 import { ref, onMounted } from 'vue'
 import type { SystemInfo } from '@/types'
+// 添加 Electron 类型导入
+import type { MessageBoxOptions, OpenDialogOptions, SaveDialogOptions } from 'electron'
 
 /**
  * Composable for interacting with Electron APIs
@@ -21,12 +23,15 @@ export function useElectron() {
         window.electronAPI.getVersion()
       ])
 
+      // 使用 window.electronAPI 获取版本信息，而不是直接访问 process
+      const versions = await window.electronAPI.getVersions()
+      
       const info: SystemInfo = {
         platform,
         version,
-        electronVersion: process.versions?.electron || 'N/A',
-        nodeVersion: process.versions?.node || 'N/A',
-        chromeVersion: process.versions?.chrome || 'N/A'
+        electronVersion: versions?.electron || 'N/A',
+        nodeVersion: versions?.node || 'N/A',
+        chromeVersion: versions?.chrome || 'N/A'
       }
 
       systemInfo.value = info
@@ -37,17 +42,17 @@ export function useElectron() {
     }
   }
 
-  const showMessageBox = async (options: Electron.MessageBoxOptions) => {
+  const showMessageBox = async (options: MessageBoxOptions) => {
     if (!window.electronAPI) return null
     return await window.electronAPI.showMessageBox(options)
   }
 
-  const showOpenDialog = async (options: Electron.OpenDialogOptions) => {
+  const showOpenDialog = async (options: OpenDialogOptions) => {
     if (!window.electronAPI) return null
     return await window.electronAPI.showOpenDialog(options)
   }
 
-  const showSaveDialog = async (options: Electron.SaveDialogOptions) => {
+  const showSaveDialog = async (options: SaveDialogOptions) => {
     if (!window.electronAPI) return null
     return await window.electronAPI.showSaveDialog(options)
   }
