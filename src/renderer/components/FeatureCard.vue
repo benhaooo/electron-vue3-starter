@@ -1,3 +1,13 @@
+<script setup lang="ts">
+interface Props {
+  title: string
+  description: string
+  icon: string
+}
+
+defineProps<Props>()
+</script>
+
 <template>
   <div class="feature-card">
     <div class="flex items-start space-x-4">
@@ -11,24 +21,18 @@
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icon"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icon" />
           </svg>
         </div>
       </div>
       <div class="flex-1">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{{ title }}</h3>
-        <p class="text-gray-600 dark:text-gray-400">{{ description }}</p>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+          {{ title }}
+        </h3>
+        <p class="text-gray-600 dark:text-gray-400">
+          {{ description }}
+        </p>
       </div>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-interface Props {
-  title: string
-  description: string
-  icon: string
-}
-
-defineProps<Props>()
-</script>

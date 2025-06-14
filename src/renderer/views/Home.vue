@@ -1,105 +1,3 @@
-<template>
-  <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-    <!-- Hero Section -->
-    <div class="text-center mb-16">
-      <div class="animate-bounce-subtle mb-8">
-        <div
-          class="w-24 h-24 mx-auto bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl flex items-center justify-center shadow-lg"
-        >
-          <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 10V3L4 14h7v7l9-11h-7z"
-            ></path>
-          </svg>
-        </div>
-      </div>
-      <h1 class="text-4xl font-bold text-gray-900 mb-4 animate-fade-in">
-        Welcome to Electron Vue3 Starter
-      </h1>
-      <p class="text-xl text-gray-600 max-w-2xl mx-auto animate-slide-up">
-        A modern desktop application template built with Electron, Vue 3, Vite, TypeScript, and
-        Tailwind CSS
-      </p>
-    </div>
-
-    <!-- Features Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-      <FeatureCard
-        v-for="feature in features"
-        :key="feature.title"
-        :title="feature.title"
-        :description="feature.description"
-        :icon="feature.icon"
-      />
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="card max-w-2xl mx-auto">
-      <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Quick Actions</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <button
-          @click="showSystemInfo"
-          class="btn btn-primary flex items-center justify-center space-x-2"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            ></path>
-          </svg>
-          <span>System Info</span>
-        </button>
-        <button
-          @click="openFileDialog"
-          class="btn btn-secondary flex items-center justify-center space-x-2"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
-            ></path>
-          </svg>
-          <span>Open File</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- System Information Display -->
-    <div v-if="systemInfo" class="card max-w-2xl mx-auto mt-8 animate-slide-up">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">System Information</h3>
-      <div class="space-y-2">
-        <div class="flex justify-between">
-          <span class="text-gray-600">Platform:</span>
-          <span class="font-medium">{{ systemInfo.platform }}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-600">App Version:</span>
-          <span class="font-medium">{{ systemInfo.version }}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-600">Node.js:</span>
-          <span class="font-medium">{{ systemInfo.nodeVersion || 'N/A' }}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-600">Electron:</span>
-          <span class="font-medium">{{ systemInfo.electronVersion || 'N/A' }}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-600">Chrome:</span>
-          <span class="font-medium">{{ systemInfo.chromeVersion || 'N/A' }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ref } from 'vue'
 import FeatureCard from '@/components/FeatureCard.vue'
@@ -147,7 +45,7 @@ const features = [
   },
 ]
 
-const showSystemInfo = async () => {
+async function showSystemInfo() {
   if (window.electronAPI) {
     try {
       const [platform, version, versions] = await Promise.all([
@@ -163,13 +61,14 @@ const showSystemInfo = async () => {
         electronVersion: versions.electron,
         chromeVersion: versions.chrome,
       }
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Failed to get system info:', error)
     }
   }
 }
 
-const openFileDialog = async () => {
+async function openFileDialog() {
   if (window.electronAPI) {
     try {
       const result = await window.electronAPI.showOpenDialog({
@@ -188,9 +87,116 @@ const openFileDialog = async () => {
           message: `Selected file: ${result.filePaths[0]}`,
         })
       }
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Failed to open file dialog:', error)
     }
   }
 }
 </script>
+
+<template>
+  <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <!-- Hero Section -->
+    <div class="text-center mb-16">
+      <div class="animate-bounce-subtle mb-8">
+        <div
+          class="w-24 h-24 mx-auto bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl flex items-center justify-center shadow-lg"
+        >
+          <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 10V3L4 14h7v7l9-11h-7z"
+            />
+          </svg>
+        </div>
+      </div>
+      <h1 class="text-4xl font-bold text-gray-900 mb-4 animate-fade-in">
+        Welcome to Electron Vue3 Starter
+      </h1>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto animate-slide-up">
+        A modern desktop application template built with Electron, Vue 3, Vite, TypeScript, and
+        Tailwind CSS
+      </p>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+      <FeatureCard
+        v-for="feature in features"
+        :key="feature.title"
+        :title="feature.title"
+        :description="feature.description"
+        :icon="feature.icon"
+      />
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card max-w-2xl mx-auto">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">
+        Quick Actions
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <button
+          class="btn btn-primary flex items-center justify-center space-x-2"
+          @click="showSystemInfo"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>System Info</span>
+        </button>
+        <button
+          class="btn btn-secondary flex items-center justify-center space-x-2"
+          @click="openFileDialog"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
+            />
+          </svg>
+          <span>Open File</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- System Information Display -->
+    <div v-if="systemInfo" class="card max-w-2xl mx-auto mt-8 animate-slide-up">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">
+        System Information
+      </h3>
+      <div class="space-y-2">
+        <div class="flex justify-between">
+          <span class="text-gray-600">Platform:</span>
+          <span class="font-medium">{{ systemInfo.platform }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-600">App Version:</span>
+          <span class="font-medium">{{ systemInfo.version }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-600">Node.js:</span>
+          <span class="font-medium">{{ systemInfo.nodeVersion || 'N/A' }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-600">Electron:</span>
+          <span class="font-medium">{{ systemInfo.electronVersion || 'N/A' }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-600">Chrome:</span>
+          <span class="font-medium">{{ systemInfo.chromeVersion || 'N/A' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

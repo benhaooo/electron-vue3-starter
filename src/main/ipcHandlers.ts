@@ -1,5 +1,7 @@
-import { ipcMain, app, dialog, shell, BrowserWindow } from 'electron'
-import { writeFile } from 'fs/promises'
+import type { BrowserWindow } from 'electron'
+import { writeFile } from 'node:fs/promises'
+import process from 'node:process'
+import { app, dialog, ipcMain, nativeTheme, shell } from 'electron'
 
 /**
  * Setup all IPC handlers for the main process
@@ -24,19 +26,22 @@ export function setupIpcHandlers(mainWindow: BrowserWindow | null) {
 
   // Dialog handlers
   ipcMain.handle('dialog:showMessageBox', async (_, options) => {
-    if (!mainWindow) return
+    if (!mainWindow)
+      return
     const result = await dialog.showMessageBox(mainWindow, options)
     return result
   })
 
   ipcMain.handle('dialog:showOpenDialog', async (_, options) => {
-    if (!mainWindow) return
+    if (!mainWindow)
+      return
     const result = await dialog.showOpenDialog(mainWindow, options)
     return result
   })
 
   ipcMain.handle('dialog:showSaveDialog', async (_, options) => {
-    if (!mainWindow) return
+    if (!mainWindow)
+      return
     const result = await dialog.showSaveDialog(mainWindow, options)
     return result
   })
@@ -49,7 +54,8 @@ export function setupIpcHandlers(mainWindow: BrowserWindow | null) {
   ipcMain.handle('window:maximize', () => {
     if (mainWindow?.isMaximized()) {
       mainWindow.unmaximize()
-    } else {
+    }
+    else {
       mainWindow?.maximize()
     }
   })
@@ -62,12 +68,47 @@ export function setupIpcHandlers(mainWindow: BrowserWindow | null) {
     return mainWindow?.isMaximized() ?? false
   })
 
+  // 窗口状态监听
+  if (mainWindow) {
+    // 监听窗口最大化状态变化
+    mainWindow.on('maximize', () => {
+      mainWindow?.webContents.send('window:maximized', true)
+    })
+
+    mainWindow.on('unmaximize', () => {
+      mainWindow?.webContents.send('window:maximized', false)
+    })
+
+    // 监听窗口焦点变化
+    mainWindow.on('focus', () => {
+      mainWindow?.webContents.send('window:focus', true)
+    })
+
+    mainWindow.on('blur', () => {
+      mainWindow?.webContents.send('window:focus', false)
+    })
+  }
+
+  // 主题同步处理器
+  ipcMain.handle('theme:update', (_, theme: 'system' | 'light' | 'dark' | 'auto') => {
+    // 在这里可以处理主进程的主题更新逻辑
+    // 例如更新原生菜单、托盘图标等
+    console.warn('Theme updated to:', theme)
+
+    // 如果是 macOS，可以更新原生标题栏外观
+    if (process.platform === 'darwin' && mainWindow) {
+      // 更新原生主题
+      nativeTheme.themeSource = theme === 'auto' ? 'system' : theme as 'system' | 'light' | 'dark'
+    }
+  })
+
   // File system handlers
   ipcMain.handle('fs:writeFile', async (_, filePath: string, content: string) => {
     try {
       await writeFile(filePath, content, 'utf8')
       return { success: true }
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Failed to write file:', error)
       return {
         success: false,
@@ -81,7 +122,8 @@ export function setupIpcHandlers(mainWindow: BrowserWindow | null) {
     try {
       await shell.openExternal(url)
       return { success: true }
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Failed to open external URL:', error)
       return {
         success: false,
@@ -106,11 +148,12 @@ export function removeIpcHandlers() {
     'window:maximize',
     'window:close',
     'window:isMaximized',
+    'theme:update',
     'fs:writeFile',
     'shell:openExternal',
   ]
 
-  handlers.forEach(handler => {
+  handlers.forEach((handler) => {
     ipcMain.removeAllListeners(handler)
   })
 }

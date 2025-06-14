@@ -1,5 +1,5 @@
+import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
-import { resolve } from 'path'
 
 export default defineConfig({
   mode: 'production',
@@ -14,16 +14,18 @@ export default defineConfig({
     rollupOptions: {
       external: [
         'electron',
-        'path',
-        'fs',
-        'os',
-        'crypto',
-        'buffer',
-        'stream',
-        'util',
-        'url',
-        'string_decoder',
-        'events',
+        'node:path',
+        'node:fs',
+        'node:fs/promises',
+        'node:process',
+        'node:os',
+        'node:crypto',
+        'node:buffer',
+        'node:stream',
+        'node:util',
+        'node:url',
+        'node:string_decoder',
+        'node:events',
       ],
     },
     minify: false,

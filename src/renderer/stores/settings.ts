@@ -1,8 +1,8 @@
+import type { AppSettings, ValidationResult } from '@/types'
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
-import type { AppSettings, ValidationResult } from '@/types'
-import { handleSuccess, withErrorHandling } from '@/utils/errorHandler'
 import { deepClone } from '@/utils'
+import { handleSuccess, withErrorHandling } from '@/utils/errorHandler'
 
 const defaultSettings: AppSettings = {
   theme: 'light',
@@ -26,7 +26,7 @@ const defaultSettings: AppSettings = {
 const STORAGE_KEY = 'app-settings'
 
 // Settings validation function with detailed error reporting
-const validateSettings = (settings: any): ValidationResult => {
+function validateSettings(settings: any): ValidationResult {
   const errors: string[] = []
 
   if (!settings || typeof settings !== 'object') {
@@ -46,7 +46,8 @@ const validateSettings = (settings: any): ValidationResult => {
   // Validate notifications
   if (!settings.notifications || typeof settings.notifications !== 'object') {
     errors.push('Notifications settings must be an object')
-  } else {
+  }
+  else {
     if (typeof settings.notifications.desktop !== 'boolean') {
       errors.push('Notifications.desktop must be a boolean')
     }
@@ -61,7 +62,8 @@ const validateSettings = (settings: any): ValidationResult => {
   // Validate performance
   if (!settings.performance || typeof settings.performance !== 'object') {
     errors.push('Performance settings must be an object')
-  } else {
+  }
+  else {
     if (typeof settings.performance.hardwareAcceleration !== 'boolean') {
       errors.push('Performance.hardwareAcceleration must be a boolean')
     }
@@ -69,8 +71,8 @@ const validateSettings = (settings: any): ValidationResult => {
       errors.push('Performance.backgroundProcessing must be a boolean')
     }
     if (
-      typeof settings.performance.memoryLimit !== 'number' ||
-      settings.performance.memoryLimit < 256
+      typeof settings.performance.memoryLimit !== 'number'
+      || settings.performance.memoryLimit < 256
     ) {
       errors.push('Performance.memoryLimit must be a number >= 256')
     }
@@ -79,7 +81,8 @@ const validateSettings = (settings: any): ValidationResult => {
   // Validate privacy
   if (!settings.privacy || typeof settings.privacy !== 'object') {
     errors.push('Privacy settings must be an object')
-  } else {
+  }
+  else {
     if (typeof settings.privacy.analytics !== 'boolean') {
       errors.push('Privacy.analytics must be a boolean')
     }
@@ -98,19 +101,31 @@ export const useSettingsStore = defineStore('settings', () => {
   const hasUnsavedChanges = ref(false)
 
   // Apply theme settings to DOM
-  const applyTheme = (theme: string) => {
+  const applyTheme = async (theme: string) => {
     const html = document.documentElement
     html.classList.remove('light', 'dark')
 
     if (theme === 'dark') {
       html.classList.add('dark')
-    } else if (theme === 'light') {
+    }
+    else if (theme === 'light') {
       html.classList.add('light')
-    } else {
+    }
+    else {
       // Auto theme - detect system preference
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
       const appliedTheme = prefersDark ? 'dark' : 'light'
       html.classList.add(appliedTheme)
+    }
+
+    // 同步主题到主进程
+    if (window.electronAPI) {
+      try {
+        await window.electronAPI.updateTheme(theme)
+      }
+      catch (error) {
+        console.warn('Failed to sync theme to main process:', error)
+      }
     }
   }
 
@@ -130,7 +145,7 @@ export const useSettingsStore = defineStore('settings', () => {
       {
         title: 'Settings Save Warning',
         type: 'warning',
-      }
+      },
     )
   }
 
@@ -147,11 +162,13 @@ export const useSettingsStore = defineStore('settings', () => {
           const validation = validateSettings(savedSettings)
           if (validation.isValid) {
             settings.value = { ...defaultSettings, ...savedSettings }
-          } else {
+          }
+          else {
             console.warn('Invalid settings format:', validation.errors)
             settings.value = deepClone(defaultSettings)
           }
-        } else {
+        }
+        else {
           settings.value = deepClone(defaultSettings)
         }
       },
@@ -159,7 +176,7 @@ export const useSettingsStore = defineStore('settings', () => {
       {
         showUserNotification: false, // 不显示通知，静默失败
         logToConsole: true,
-      }
+      },
     )
 
     isLoading.value = false
@@ -177,7 +194,7 @@ export const useSettingsStore = defineStore('settings', () => {
       'Failed to save settings',
       {
         title: 'Save Failed',
-      }
+      },
     )
 
     return result !== null
@@ -191,7 +208,8 @@ export const useSettingsStore = defineStore('settings', () => {
 
   // Export settings to JSON file
   const exportSettings = async (): Promise<boolean> => {
-    if (!window.electronAPI) return false
+    if (!window.electronAPI)
+      return false
 
     const result = await withErrorHandling(
       async () => {
@@ -204,16 +222,17 @@ export const useSettingsStore = defineStore('settings', () => {
           const settingsJson = JSON.stringify(settings.value, null, 2)
           const writeResult = await window.electronAPI.writeFile(
             dialogResult.filePath,
-            settingsJson
+            settingsJson,
           )
 
           if (writeResult.success) {
             await handleSuccess(
               `Settings successfully exported to: ${dialogResult.filePath}`,
-              'Export Complete'
+              'Export Complete',
             )
             return true
-          } else {
+          }
+          else {
             throw new Error(writeResult.error || 'Failed to write file')
           }
         }
@@ -222,7 +241,7 @@ export const useSettingsStore = defineStore('settings', () => {
       'Failed to export settings',
       {
         title: 'Export Error',
-      }
+      },
     )
 
     return result !== null && result !== false
@@ -230,7 +249,8 @@ export const useSettingsStore = defineStore('settings', () => {
 
   // Import settings from JSON file
   const importSettings = async (): Promise<boolean> => {
-    if (!window.electronAPI) return false
+    if (!window.electronAPI)
+      return false
 
     const result = await withErrorHandling(
       async () => {
@@ -245,7 +265,7 @@ export const useSettingsStore = defineStore('settings', () => {
           // For now, we'll show a placeholder
           await handleSuccess(
             `Settings import from ${filePath} would be implemented here`,
-            'Import Placeholder'
+            'Import Placeholder',
           )
           return true
         }
@@ -254,7 +274,7 @@ export const useSettingsStore = defineStore('settings', () => {
       'Failed to import settings',
       {
         title: 'Import Error',
-      }
+      },
     )
 
     return result !== null && result !== false
@@ -263,7 +283,7 @@ export const useSettingsStore = defineStore('settings', () => {
   // Initialize settings (load and apply)
   const initializeSettings = async () => {
     await loadSettings()
-    applyTheme(settings.value.theme)
+    await applyTheme(settings.value.theme)
     applyFontSize(settings.value.fontSize)
   }
 
@@ -282,11 +302,11 @@ export const useSettingsStore = defineStore('settings', () => {
   // Watch theme changes and apply immediately
   watch(
     () => settings.value.theme,
-    (newTheme: string) => {
-      applyTheme(newTheme)
+    async (newTheme: string) => {
+      await applyTheme(newTheme)
       debouncedAutoSave()
     },
-    { immediate: false }
+    { immediate: false },
   )
 
   // Watch font size changes and apply immediately
@@ -296,7 +316,7 @@ export const useSettingsStore = defineStore('settings', () => {
       applyFontSize(newSize)
       debouncedAutoSave()
     },
-    { immediate: false }
+    { immediate: false },
   )
 
   // Watch all other settings changes
@@ -305,7 +325,7 @@ export const useSettingsStore = defineStore('settings', () => {
     () => {
       debouncedAutoSave()
     },
-    { deep: true, immediate: false }
+    { deep: true, immediate: false },
   )
 
   return {
