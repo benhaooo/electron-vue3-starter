@@ -6,7 +6,6 @@ import { useSettingsStore } from '@/stores/settings'
 
 const route = useRoute()
 const settingsStore = useSettingsStore()
-const appTitle = ref('Electron Vue3 Starter')
 const appVersion = ref('1.0.0')
 const platform = ref('unknown')
 const showAboutModal = ref(false)
