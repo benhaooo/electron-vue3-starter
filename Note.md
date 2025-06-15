@@ -7,3 +7,16 @@
     "vue": "^3.3.8",
     "vue-router": "^4.2.5",
   }
+
+推荐vscode设置
+{
+    // 确保 ESLint 扩展能处理格式化
+    "eslint.format.enable": true,
+
+    // 将 ESLint 设置为所有文件的默认格式化程序
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+
+    "[typescript]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    }
+}
