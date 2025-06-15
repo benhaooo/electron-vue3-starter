@@ -2,24 +2,24 @@
   "compilerOptions": {
     "composite": true,
     "target": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "baseUrl": ".",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "esModuleInterop": true,
-    "lib": ["ESNext", "DOM"],
-    "skipLibCheck": true,
-    "baseUrl": ".",
     "paths": {
       "@/*": ["src/renderer/*"]
     },
+    "resolveJsonModule": true,
     "types": [
       "node",
       "electron-vite/node"
     ],
-    "resolveJsonModule": true,
+    "strict": true,
+    "noEmit": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "isolatedModules": true,
-    "noEmit": true
+    "skipLibCheck": true
   },
   "include": [
     "src/main/**/*",
