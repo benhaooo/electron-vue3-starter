@@ -1,3 +1,4 @@
+import { builtinModules } from 'node:module'
 import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
 
@@ -14,18 +15,7 @@ export default defineConfig({
     rollupOptions: {
       external: [
         'electron',
-        'node:path',
-        'node:fs',
-        'node:fs/promises',
-        'node:process',
-        'node:os',
-        'node:crypto',
-        'node:buffer',
-        'node:stream',
-        'node:util',
-        'node:url',
-        'node:string_decoder',
-        'node:events',
+        ...builtinModules.flatMap(p => [p, `node:${p}`]),
       ],
     },
     minify: false,
