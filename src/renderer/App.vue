@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import AboutModal from '@/components/AboutModal.vue'
 import { useSettingsStore } from '@/stores/settings'
@@ -9,6 +9,18 @@ const settingsStore = useSettingsStore()
 const appVersion = ref('1.0.0')
 const platform = ref('unknown')
 const showAboutModal = ref(false)
+
+const titlebarHeight = computed(() => {
+  // Use 28px for macOS and 30px for other platforms
+  return platform.value === 'darwin' ? '28px' : '30px'
+})
+
+const mainPaddingTop = computed(() => {
+  // The navbar height is h-16 which is 4rem (64px)
+  const navbarHeight = 64
+  const titlebarHeightValue = platform.value === 'darwin' ? 28 : 30
+  return `${titlebarHeightValue + navbarHeight}px`
+})
 
 const navigationRoutes = [
   { path: '/', name: 'Home' },
@@ -54,7 +66,8 @@ onUnmounted(() => {
   <div id="app" class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
     <!-- Navigation -->
     <nav
-      class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-200"
+      class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-200 fixed w-full z-50"
+      :style="{ top: titlebarHeight }"
     >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -85,7 +98,7 @@ onUnmounted(() => {
     </nav>
 
     <!-- Main Content -->
-    <main class="flex-1">
+    <main class="flex-1" :style="{ paddingTop: mainPaddingTop }">
       <router-view />
     </main>
 
