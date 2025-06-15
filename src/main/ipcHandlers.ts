@@ -93,7 +93,6 @@ export function setupIpcHandlers(mainWindow: BrowserWindow | null) {
   ipcMain.handle('theme:update', (_, theme: 'system' | 'light' | 'dark' | 'auto') => {
     // 在这里可以处理主进程的主题更新逻辑
     // 例如更新原生菜单、托盘图标等
-    console.warn('Theme updated to:', theme)
 
     // 如果是 macOS，可以更新原生标题栏外观
     if (process.platform === 'darwin' && mainWindow) {

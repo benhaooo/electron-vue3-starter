@@ -1,4 +1,4 @@
-import { Titlebar } from 'custom-electron-titlebar'
+import { Titlebar, TitlebarColor } from 'custom-electron-titlebar'
 import { contextBridge, ipcRenderer } from 'electron'
 
 // Define the API interface
@@ -83,7 +83,38 @@ const electronAPI: ElectronAPI = {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  new Titlebar()
+  // 初始化时根据document的类来判断当前主题
+  const isDarkTheme = document.documentElement.classList.contains('dark')
+
+  // 创建带有主题颜色的Titlebar
+  const titlebar = new Titlebar({
+    backgroundColor: isDarkTheme
+      ? TitlebarColor.fromHex('#1f2937')
+      : TitlebarColor.fromHex('#ffffff'),
+    unfocusEffect: true,
+  })
+
+  // 监听主题变化
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (
+        mutation.type === 'attributes'
+        && mutation.attributeName === 'class'
+      ) {
+        const isDark = document.documentElement.classList.contains('dark')
+        // 根据当前主题更新titlebar背景色
+        if (isDark) {
+          titlebar.updateBackground(TitlebarColor.fromHex('#1f2937'))
+        }
+        else {
+          titlebar.updateBackground(TitlebarColor.fromHex('#ffffff'))
+        }
+      }
+    })
+  })
+
+  // 观察html元素的class变化，因为主题是通过添加/移除dark类来实现的
+  observer.observe(document.documentElement, { attributes: true })
 })
 
 // Expose the API to the renderer process

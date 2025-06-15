@@ -62,11 +62,11 @@ class ElectronApp {
       minWidth: 800,
       minHeight: 600,
       show: false,
-      autoHideMenuBar: true, // 隐藏菜单栏，按 Alt 键显示
       frame: false,
       titleBarStyle: 'hidden',
       titleBarOverlay: true,
       webPreferences: {
+        sandbox: false,
         nodeIntegration: false,
         contextIsolation: true,
         preload: join(__dirname, '../preload/preload.cjs'),
