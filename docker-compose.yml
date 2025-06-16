@@ -1,0 +1,48 @@
+# 定义一个可复用的构建配置锚点
+x-build-defaults: &build-defaults
+  build:
+    context: .
+    args:
+      # 将环境变量传递给Dockerfile中的ARG
+      # Docker Compose会自动从.env文件加载环境变量
+      NPM_MIRROR: ${NPM_MIRROR}
+      BUILD_TYPE: ${BUILD_TYPE}
+      USE_NON_ROOT: ${USE_NON_ROOT}
+      OUTPUT_PERMISSION: ${OUTPUT_PERMISSION}
+
+services:
+  # Linux构建服务
+  build-linux:
+    image: electron-builder:linux # 为镜像指定一个清晰的名称
+    <<: *build-defaults # 引用默认配置
+    build:
+      dockerfile: Dockerfile.linux # 只覆盖特定的dockerfile
+    volumes:
+      - ${OUTPUT_DIR_LINUX}:/release # 移除./前缀以支持绝对路径
+  
+  # Windows构建服务
+  build-windows:
+    image: electron-builder:win # 为镜像指定一个清晰的名称
+    <<: *build-defaults # 引用默认配置
+    build:
+      dockerfile: Dockerfile.win # 只覆盖特定的dockerfile
+    volumes:
+      - ${OUTPUT_DIR_WIN}:/release # 移除./前缀以支持绝对路径
+  
+  # macOS构建服务 (注意：生成的是未签名版本)
+  build-mac:
+    image: electron-builder:mac # 为镜像指定一个清晰的名称
+    <<: *build-defaults # 引用默认配置
+    build:
+      dockerfile: Dockerfile.mac # 只覆盖特定的dockerfile
+    volumes:
+      - ${OUTPUT_DIR_MAC}:/release # 移除./前缀以支持绝对路径
+      
+  # 构建所有平台应用
+  build-all:
+    depends_on:
+      - build-linux
+      - build-windows
+      - build-mac
+    image: alpine:latest
+    command: echo "所有平台构建完成！" 

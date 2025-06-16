@@ -126,6 +126,75 @@ npm run build:linux  # Linux
 
 The built application will be available in the `release/` directory.
 
+### 🐳 Building with Docker
+
+This project supports cross-platform builds using Docker, which is very helpful for ensuring a consistent build environment without installing complex dependencies on your local machine.
+
+#### Prerequisites
+
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/) (usually included with Docker Desktop)
+
+#### Configuration
+
+1.  Create a `.env` file in the project root. You can use the example below to configure your build environment:
+
+    ```env
+    # ------------------------- Docker Build Environment Configuration -------------------------
+
+    # NPM mirror (optional, defaults to https://registry.npmmirror.com)
+    NPM_MIRROR=https://registry.npmmirror.com
+
+    # ------------------------- Output Configuration -------------------------
+
+    # Output directories (can be relative or absolute paths)
+    # 1. Relative path: Recommended to start with './', e.g., './release/win'
+    # 2. Absolute path: Use a format that Docker can recognize.
+    #    - Linux/macOS: /path/to/your/dir
+    #    - Windows (WSL2): /mnt/c/Users/YourUser/Desktop
+    #    - Please ensure the path case is correct.
+    OUTPUT_DIR_WIN=./release/win
+    OUTPUT_DIR_LINUX=./release/linux
+    OUTPUT_DIR_MAC=./release/mac
+
+    # ------------------------- Advanced Options -------------------------
+
+    # Whether to run the build inside the Docker container as a non-root user (electronuser) (true/false)
+    # Defaults to 'false'
+    USE_NON_ROOT=false
+
+    # Set permissions for the Docker volume mount output directory.
+    # If you encounter permission issues on Linux, you can try '777'.
+    OUTPUT_PERMISSION=777
+    ```
+
+2.  **Important Notes**:
+    *   **Path Format**: The Docker build script will not automatically modify the paths you provide. It is your responsibility to decide whether to use a relative path (starting with `./`) or an absolute path (starting with `/`). Incorrect path formats may cause build failures or output files to be placed in unintended locations.
+    *   **Absolute Paths & WSL**: When using Docker in a WSL2 environment on Windows, your Windows drives (e.g., `D:\`) are mounted under the `/mnt/` directory (e.g., `/mnt/d/`). Please ensure you use the correct absolute path and pay attention to case sensitivity.
+
+#### Build Commands
+
+Use the `docker-build.sh` script in the root directory to perform builds. Before running, ensure the script is executable: `chmod +x docker-build.sh`.
+
+```bash
+# Show help information
+./docker-build.sh
+
+# Build for Windows
+./docker-build.sh win
+
+# Build for Linux
+./docker-build.sh linux
+
+# Build for macOS
+./docker-build.sh mac
+
+# Build for all platforms at once
+./docker-build.sh all
+```
+
+The build artifacts will be placed in the directories specified in your `.env` file.
+
 ## 🔧 Configuration
 
 ### Electron Builder

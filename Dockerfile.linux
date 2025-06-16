@@ -1,0 +1,45 @@
+# 声明构建参数
+ARG NPM_MIRROR
+ARG BUILD_TYPE
+ARG USE_NON_ROOT
+ARG OUTPUT_PERMISSION
+
+# 使用专为Electron应用构建的官方镜像
+FROM electronuserland/builder:18
+
+# 将构建时参数固化为运行时环境变量
+ENV OUTPUT_PERMISSION=${OUTPUT_PERMISSION}
+
+# 设置工作目录
+WORKDIR /app
+
+# 复制package.json和package-lock.json
+COPY package*.json ./
+
+# 使用传入的构建参数来设置镜像源
+RUN npm config set registry ${NPM_MIRROR}
+
+# 如果USE_NON_ROOT为true，则切换到非root用户
+RUN if [ "${USE_NON_ROOT}" = "true" ]; then \
+      chown -R node:node /app; \
+      USER node; \
+    fi
+
+# 安装依赖
+RUN npm install
+
+# 复制源代码
+COPY . .
+RUN if [ "${USE_NON_ROOT}" = "true" ]; then \
+      chown -R node:node /app; \
+    fi
+
+# 始终执行生产构建命令
+RUN npm run build:linux
+
+# 设置输出卷
+VOLUME /release
+
+# 当容器启动时，将构建产物复制到挂载的卷中，并设置合适的权限
+# 使用${OUTPUT_PERMISSION}可以访问在运行时可用的环境变量
+CMD ["sh", "-c", "cp -r /app/release/. /release/ && chmod -R ${OUTPUT_PERMISSION:-777} /release/"] 

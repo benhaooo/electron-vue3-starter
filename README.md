@@ -120,6 +120,75 @@ npm run build:linux  # Linux
 
 构建的应用将在 `release/` 目录中可用。
 
+### 🐳 使用 Docker 构建
+
+本项目支持使用 Docker 进行跨平台构建，无需在本地环境中安装复杂的依赖。这对于确保构建环境的一致性非常有帮助。
+
+#### 前提条件
+
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/) (通常随 Docker Desktop 一起安装)
+
+#### 配置
+
+1.  在项目根目录创建一个 `.env` 文件。您可以参考以下示例来配置您的构建环境：
+
+    ```env
+    # ------------------------- Docker 构建环境配置 -------------------------
+
+    # NPM 镜像源 (可选, 默认为 https://registry.npmmirror.com)
+    NPM_MIRROR=https://registry.npmmirror.com
+
+    # ------------------------- 输出配置 -------------------------
+
+    # 输出目录 (可以是相对路径或绝对路径)
+    # 1. 相对路径: 推荐使用 './' 开头，例如 './release/win'
+    # 2. 绝对路径: 使用 Docker 能识别的格式。
+    #    - Linux/macOS: /path/to/your/dir
+    #    - Windows (WSL2): /mnt/c/Users/YourUser/Desktop
+    #    - 请确保路径大小写正确
+    OUTPUT_DIR_WIN=./release/win
+    OUTPUT_DIR_LINUX=./release/linux
+    OUTPUT_DIR_MAC=./release/mac
+
+    # ------------------------- 高级选项 -------------------------
+
+    # 是否在 Docker 容器内使用非 root 用户 (electronuser) 运行构建 (true/false)
+    # 默认为 'false'
+    USE_NON_ROOT=false
+
+    # 设置 Docker 卷挂载输出目录的权限
+    # 如果您在 Linux 上遇到权限问题，可以尝试 '777'
+    OUTPUT_PERMISSION=777
+    ```
+
+2.  **重要提示**:
+    *   **路径格式**: Docker 构建脚本不会自动修改您提供的路径。请根据您的需求，自行决定是使用相对路径 (`./` 开头) 还是绝对路径 (`/` 开头)。错误的路径格式可能会导致构建失败或文件输出到非预期的位置。
+    *   **绝对路径与 WSL**: 在 Windows 的 WSL2 环境下使用 Docker 时，您的 Windows 盘符（如 `D:\`）会被挂载到 `/mnt/` 目录下（如 `/mnt/d/`）。请确保使用正确的绝对路径，并注意大小写。
+
+#### 构建命令
+
+使用根目录下的 `docker-build.sh` 脚本来执行构建。在执行前，请确保为脚本添加可执行权限：`chmod +x docker-build.sh`。
+
+```bash
+# 显示帮助信息
+./docker-build.sh
+
+# 构建 Windows 应用
+./docker-build.sh win
+
+# 构建 Linux 应用
+./docker-build.sh linux
+
+# 构建 macOS 应用
+./docker-build.sh mac
+
+# 一次性构建所有平台的应用
+./docker-build.sh all
+```
+
+构建产物将根据 `.env` 文件中的配置，输出到指定的目录中。
+
 ## 🔧 配置
 
 ### Electron Builder
